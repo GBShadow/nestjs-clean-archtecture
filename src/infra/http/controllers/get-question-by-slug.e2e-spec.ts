@@ -8,7 +8,7 @@ import request from 'supertest'
 import { QuestionFactory } from 'test/factories/make-question'
 import { StudentFactory } from 'test/factories/make-student'
 
-describe('FetchRecentQuestionController (E2E)', () => {
+describe('GetQuestionBySlugController (E2E)', () => {
   let app: INestApplication
   let jwt: JwtService
   let studentFactory: StudentFactory
@@ -21,17 +21,14 @@ describe('FetchRecentQuestionController (E2E)', () => {
     }).compile()
 
     app = moduleRef.createNestApplication()
+    jwt = moduleRef.get(JwtService)
     studentFactory = moduleRef.get(StudentFactory)
     questionFactory = moduleRef.get(QuestionFactory)
-    jwt = moduleRef.get(JwtService)
+
     await app.init()
   })
-  test('[GET] /questions', async () => {
-    const user = await studentFactory.makePrismaStudent({
-      name: 'John Doe',
-      email: 'john@dev.com',
-      password: '123456',
-    })
+  test('[GET] /questions/:slug', async () => {
+    const user = await studentFactory.makePrismaStudent()
 
     const accessToken = jwt.sign({
       sub: user.id.toString(),
@@ -39,32 +36,19 @@ describe('FetchRecentQuestionController (E2E)', () => {
 
     await questionFactory.makePrismaQuestion({
       title: 'New Question 0',
-      content: 'Content Question 0',
       slug: Slug.create('new-question-0'),
-      authorId: user.id,
-    })
-    await questionFactory.makePrismaQuestion({
-      title: 'New Question 1',
-      content: 'Content Question 1',
-      slug: Slug.create('new-question-1'),
       authorId: user.id,
     })
 
     const response = await request(app.getHttpServer())
-      .get('/questions')
+      .get(`/questions/new-question-0`)
       .set('Authorization', `Bearer ${accessToken}`)
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toEqual({
-      page: 1,
-      questions: [
-        expect.objectContaining({
-          title: 'New Question 1',
-        }),
-        expect.objectContaining({
-          title: 'New Question 0',
-        }),
-      ],
+      question: expect.objectContaining({
+        title: 'New Question 0',
+      }),
     })
   })
 })
