@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
   "name": "Gbs",
-  "email": "gbs@dev.com",
+  "email": "gbs2@dev.com",
   "password": "gbs123"
 }
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "title": "Slug test2",
+  "title": "Slug test 4",
   "content": "conteudo"
 }
 
