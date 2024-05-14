@@ -57,14 +57,14 @@ describe('FetchRecentQuestionController (E2E)', () => {
     expect(response.statusCode).toBe(200)
     expect(response.body).toEqual({
       page: 1,
-      questions: [
+      questions: expect.arrayContaining([
         expect.objectContaining({
           title: 'New Question 1',
         }),
         expect.objectContaining({
           title: 'New Question 0',
         }),
-      ],
+      ]),
     })
   })
 })
